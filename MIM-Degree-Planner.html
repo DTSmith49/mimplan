@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Master of Information Management - 2-Year Degree Planner</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1a3a52;
+            --secondary: #00a878;
+            --gray-light: #ecf0f1;
+            --gray-lighter: #f5f7fa;
+            --white: #ffffff;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--gray-lighter);
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 280px;
+            background: linear-gradient(180deg, #0f2838 0%, var(--primary) 100%);
+            color: white;
+            padding: 30px 0;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow-y: auto;
+        }
+
+        .sidebar-header {
+            padding: 0 20px 30px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-logo {
+            font-size: 1.4em;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-subtitle {
+            font-size: 0.75em;
+            opacity: 0.8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .sidebar-nav-link {
+            display: flex;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
+            cursor: pointer;
+            border-left: 3px solid transparent;
+            transition: all 0.3s;
+            gap: 15px;
+        }
+
+        .sidebar-nav-link:hover,
+        .sidebar-nav-link.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: var(--secondary);
+        }
+
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 1px solid var(--gray-light);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-content h1 {
+            font-size: 1.8em;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .header-content p {
+            font-size: 0.95em;
+            color: #7f8c8d;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+        }
+
+        .view {
+            display: none;
+        }
+
+        .view.active {
+            display: block;
+        }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 30px;
+        }
+
+        .info-box {
+            background: linear-gradient(135deg, #d1ecf1 0%, #e7f5f9 100%);
+            border-left: 4px solid #0c5460;
+            color: #0c5460;
+            padding: 15px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 0.95em;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--gray-light);
+        }
+
+        .tab {
+            padding: 12px 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: #7f8c8d;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+            font-size: 1em;
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--secondary);
+        }
+
+        .planner-layout {
+            display: grid;
+            grid-template-columns: 1fr 420px;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .semesters-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .semester-block {
+            background: var(--gray-lighter);
+            border-radius: 8px;
+            padding: 20px;
+            border: 2px dashed #bdc3c7;
+            min-height: 350px;
+            transition: all 0.3s;
+        }
+
+        .semester-block.dragover {
+            background: rgba(0, 168, 120, 0.1);
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(0, 168, 120, 0.1);
+        }
+
+        .semester-title {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--secondary);
+        }
+
+        .semester-credits {
+            font-size: 0.85em;
+            background: var(--secondary);
+            color: white;
+            padding: 6px 14px;
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+
+        .courses-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-height: 150px;
+        }
+
+        .course-pool-sidebar {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--shadow-md);
+            max-height: calc(100vh - 200px);
+            overflow-y: auto;
+            position: sticky;
+            top: 20px;
+        }
+
+        .pool-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .pool-search {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid var(--gray-light);
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+
+        .pool-search:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        .pool-section {
+            margin-bottom: 20px;
+        }
+
+        .pool-section-title {
+            font-size: 0.8em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #7f8c8d;
+            font-weight: 700;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pool-section-count {
+            background: #95a5a6;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
+        }
+
+        .pool-courses {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            max-height: 280px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .course-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            cursor: move;
+            transition: all 0.2s;
+            user-select: none;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            font-size: 0.9em;
+        }
+
+        .course-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+            border-color: var(--secondary);
+        }
+
+        .course-card.dragging {
+            opacity: 0.5;
+        }
+
+        .course-card.placed {
+            background: linear-gradient(135deg, #2cc998 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+        }
+
+        .course-card.used {
+            opacity: 0.25;
+            pointer-events: none;
+            filter: grayscale(0.8);
+        }
+
+        .course-code {
+            font-weight: 700;
+            margin-bottom: 3px;
+            font-size: 0.95em;
+        }
+
+        .course-title {
+            font-size: 0.85em;
+            margin-bottom: 4px;
+            line-height: 1.3;
+        }
+
+        .course-credits {
+            font-size: 0.75em;
+            opacity: 0.9;
+        }
+
+        .btn-remove {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 0.75em;
+            font-weight: 600;
+        }
+
+        .btn-remove:hover {
+            background: #c0392b;
+        }
+
+        .btn-reset {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-bottom: 20px;
+            margin-right: 10px;
+            display: inline-block;
+        }
+
+        .btn-reset:hover {
+            background: #2980b9;
+        }
+
+        .btn-export {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .btn-export:hover {
+            background: #229954;
+        }
+
+        @media (max-width: 1024px) {
+            .planner-layout {
+                grid-template-columns: 1fr;
+            }
+            .semesters-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Custom Scrollbar for course pool */
+        .pool-courses::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .pool-courses::-webkit-scrollbar-track {
+            background: var(--gray-lighter);
+            border-radius: 4px;
+        }
+
+        .pool-courses::-webkit-scrollbar-thumb {
+            background: #bdc3c7;
+            border-radius: 4px;
+        }
+
+        .pool-courses::-webkit-scrollbar-thumb:hover {
+            background: #95a5a6;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">📚 MIM Planner</div>
+                <div class="sidebar-subtitle">Master of Information</div>
+            </div>
+            <nav>
+                <div class="sidebar-nav-link active" onclick="switchView('planner')">📋 2-Year Planner</div>
+            </nav>
+        </aside>
+
+        <div class="main-content">
+            <header class="header">
+                <div class="header-content">
+                    <h1>Master of Information Management</h1>
+                    <p>2-Year Degree Planner</p>
+                </div>
+                <div class="header-actions">
+                    <button class="btn-export" onclick="exportPlanToCSV(currentTrack)">📥 Export Plan as CSV</button>
+                </div>
+            </header>
+
+            <main class="content">
+                <div id="planner" class="view active">
+                    <div class="card">
+                        <div class="info-box">
+                            💡 <strong>How to use:</strong> Select a track to see a pre-populated 2-year plan. Remove courses with the × button or drag courses between semesters to customize. Use the search box to quickly find electives.
+                        </div>
+
+                        <div class="tabs">
+                            <button class="tab active" onclick="switchTrack('data-science', this)">📊 Data Science & Analytics</button>
+                            <button class="tab" onclick="switchTrack('cybersecurity', this)">🔐 Cybersecurity & Risk Mgmt</button>
+                            <button class="tab" onclick="switchTrack('flexible', this)">🎯 Flexible Individual Plan</button>
+                        </div>
+
+                        <!-- DATA SCIENCE TRACK -->
+                        <div id="data-science-tab" class="track-tab">
+                            <div style="margin-bottom: 20px;">
+                                <button class="btn-reset" onclick="resetTrack('data-science')">🔄 Reset to Default Plan</button>
+                            </div>
+                            <div class="planner-layout">
+                                <div class="semesters-container">
+                                    <div class="semester-block" data-track="data-science" data-semester="y1f">
+                                        <div class="semester-title">Year 1 - Fall</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="data-science" data-semester="y1f"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="data-science" data-semester="y1s">
+                                        <div class="semester-title">Year 1 - Spring</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="data-science" data-semester="y1s"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="data-science" data-semester="y2f">
+                                        <div class="semester-title">Year 2 - Fall</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="data-science" data-semester="y2f"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="data-science" data-semester="y2s">
+                                        <div class="semester-title">Year 2 - Spring</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="data-science" data-semester="y2s"></div>
+                                    </div>
+                                </div>
+
+                                <div class="course-pool-sidebar">
+                                    <div class="pool-title">📚 Available Courses</div>
+                                    <input type="text" class="pool-search" id="ds-search" placeholder="Search courses..." onkeyup="filterCourses('data-science', this.value)">
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>Core (Required)</span>
+                                            <span class="pool-section-count" id="ds-core-count">4</span>
+                                        </div>
+                                        <div class="pool-courses" id="ds-core"></div>
+                                    </div>
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>Track Required</span>
+                                            <span class="pool-section-count" id="ds-required-count">6</span>
+                                        </div>
+                                        <div class="pool-courses" id="ds-required"></div>
+                                    </div>
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>All Grad Electives</span>
+                                            <span class="pool-section-count" id="ds-electives-count">72</span>
+                                        </div>
+                                        <div class="pool-courses" id="ds-electives"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- CYBERSECURITY TRACK -->
+                        <div id="cybersecurity-tab" class="track-tab" style="display:none;">
+                            <div style="margin-bottom: 20px;">
+                                <button class="btn-reset" onclick="resetTrack('cybersecurity')">🔄 Reset to Default Plan</button>
+                            </div>
+                            <div class="planner-layout">
+                                <div class="semesters-container">
+                                    <div class="semester-block" data-track="cybersecurity" data-semester="y1f">
+                                        <div class="semester-title">Year 1 - Fall</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="cybersecurity" data-semester="y1f"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="cybersecurity" data-semester="y1s">
+                                        <div class="semester-title">Year 1 - Spring</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="cybersecurity" data-semester="y1s"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="cybersecurity" data-semester="y2f">
+                                        <div class="semester-title">Year 2 - Fall</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="cybersecurity" data-semester="y2f"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="cybersecurity" data-semester="y2s">
+                                        <div class="semester-title">Year 2 - Spring</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="cybersecurity" data-semester="y2s"></div>
+                                    </div>
+                                </div>
+
+                                <div class="course-pool-sidebar">
+                                    <div class="pool-title">📚 Available Courses</div>
+                                    <input type="text" class="pool-search" id="cs-search" placeholder="Search courses..." onkeyup="filterCourses('cybersecurity', this.value)">
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>Core (Required)</span>
+                                            <span class="pool-section-count" id="cs-core-count">4</span>
+                                        </div>
+                                        <div class="pool-courses" id="cs-core"></div>
+                                    </div>
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>Track Required</span>
+                                            <span class="pool-section-count" id="cs-required-count">6</span>
+                                        </div>
+                                        <div class="pool-courses" id="cs-required"></div>
+                                    </div>
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>All Grad Electives</span>
+                                            <span class="pool-section-count" id="cs-electives-count">72</span>
+                                        </div>
+                                        <div class="pool-courses" id="cs-electives"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- FLEXIBLE TRACK -->
+                        <div id="flexible-tab" class="track-tab" style="display:none;">
+                            <div style="margin-bottom: 20px;">
+                                <button class="btn-reset" onclick="resetTrack('flexible')">🔄 Reset to Default Plan</button>
+                            </div>
+                            <div class="planner-layout">
+                                <div class="semesters-container">
+                                    <div class="semester-block" data-track="flexible" data-semester="y1f">
+                                        <div class="semester-title">Year 1 - Fall</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="flexible" data-semester="y1f"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="flexible" data-semester="y1s">
+                                        <div class="semester-title">Year 1 - Spring</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="flexible" data-semester="y1s"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="flexible" data-semester="y2f">
+                                        <div class="semester-title">Year 2 - Fall</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="flexible" data-semester="y2f"></div>
+                                    </div>
+                                    <div class="semester-block" data-track="flexible" data-semester="y2s">
+                                        <div class="semester-title">Year 2 - Spring</div>
+                                        <div class="semester-credits">0 credits</div>
+                                        <div class="courses-list" data-track="flexible" data-semester="y2s"></div>
+                                    </div>
+                                </div>
+
+                                <div class="course-pool-sidebar">
+                                    <div class="pool-title">📚 Available Courses</div>
+                                    <input type="text" class="pool-search" id="flex-search" placeholder="Search courses..." onkeyup="filterCourses('flexible', this.value)">
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>Core (Required)</span>
+                                            <span class="pool-section-count" id="flex-core-count">4</span>
+                                        </div>
+                                        <div class="pool-courses" id="flex-core"></div>
+                                    </div>
+                                    <div class="pool-section">
+                                        <div class="pool-section-title">
+                                            <span>All Grad Electives</span>
+                                            <span class="pool-section-count" id="flex-electives-count">72</span>
+                                        </div>
+                                        <div class="pool-courses" id="flex-electives"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // All 72 UMD INST Graduate Courses
+        const allGradCourses = [
+            { code: 'INST600', title: 'Foundations for Librarians and Information Professionals', credits: 3 },
+            { code: 'INST604', title: 'Introduction to Archives and Digital Curation', credits: 3 },
+            { code: 'INST607', title: 'Government Information', credits: 3 },
+            { code: 'INST610', title: 'Information Ethics', credits: 3 },
+            { code: 'INST611', title: 'Privacy and Security in a Networked World', credits: 3 },
+            { code: 'INST612', title: 'Information Policy', credits: 3 },
+            { code: 'INST613', title: 'Information and Human Rights', credits: 3 },
+            { code: 'INST614', title: 'Literacy and Inclusion', credits: 3 },
+            { code: 'INST615', title: 'Information Professionals and the Law', credits: 3 },
+            { code: 'INST616', title: 'Open Source Intelligence', credits: 3 },
+            { code: 'INST617', title: 'Computational Journalism', credits: 3 },
+            { code: 'INST620', title: 'Diverse Populations Inclusion and Information', credits: 3 },
+            { code: 'INST622', title: 'Information and Universal Usability', credits: 3 },
+            { code: 'INST626', title: 'CSS/HTML Basics', credits: 3 },
+            { code: 'INST627', title: 'Data Analytics for Information Professionals', credits: 3 },
+            { code: 'INST630', title: 'Programming Human-Centered Interfaces', credits: 3 },
+            { code: 'INST632', title: 'Human-Computer Interaction Design Methods', credits: 3 },
+            { code: 'INST633', title: 'Analyzing Social Networks and Social Media', credits: 3 },
+            { code: 'INST640', title: 'Principles of Digital Curation', credits: 3 },
+            { code: 'INST641', title: 'Policy and Ethics in Digital Curation', credits: 3 },
+            { code: 'INST643', title: 'Curation in Cultural Institutions', credits: 3 },
+            { code: 'INST644', title: 'Introduction to Digital Humanities', credits: 3 },
+            { code: 'INST646', title: 'Principles of Records and Information Management', credits: 3 },
+            { code: 'INST647', title: 'Management of Electronic Records and Information', credits: 3 },
+            { code: 'INST650', title: 'Facilitating Youth Learning in Formal and Informal Environments', credits: 3 },
+            { code: 'INST651', title: 'Promoting Rich Learning with Technology', credits: 3 },
+            { code: 'INST652', title: 'Design Thinking and Youth', credits: 3 },
+            { code: 'INST653', title: 'Introduction to Museum Scholarship', credits: 3 },
+            { code: 'INST660', title: 'Strategic Leadership', credits: 3 },
+            { code: 'INST661', title: 'Introduction to Game Entertainment and Media Analytics', credits: 3 },
+            { code: 'INST701', title: 'Introduction to Research Methods', credits: 3 },
+            { code: 'INST702', title: 'Advanced Usability Testing', credits: 3 },
+            { code: 'INST703', title: 'Visual Design Studio', credits: 3 },
+            { code: 'INST704', title: 'Inclusive Design in HCI', credits: 3 },
+            { code: 'INST705', title: 'Game Design Studio', credits: 3 },
+            { code: 'INST706', title: 'Project Management', credits: 3 },
+            { code: 'INST710', title: 'User Experience Research Methods', credits: 3 },
+            { code: 'INST711', title: 'Interaction Design Studio', credits: 3 },
+            { code: 'INST713', title: 'Futures of Work', credits: 3 },
+            { code: 'INST725', title: 'Legal Research for Information Professionals', credits: 3 },
+            { code: 'INST726', title: 'Information Governance', credits: 3 },
+            { code: 'INST727', title: 'Information Institutions Roles and Responses during Crises', credits: 3 },
+            { code: 'INST730', title: 'Games as Emergent Experiences', credits: 3 },
+            { code: 'INST731', title: 'Advanced Game Entertainment and Media Analytics', credits: 3 },
+            { code: 'INST732', title: 'Entertainment Theory', credits: 3 },
+            { code: 'INST733', title: 'Database Design', credits: 3 },
+            { code: 'INST734', title: 'Information Retrieval Systems', credits: 3 },
+            { code: 'INST735', title: 'Natural Language Processing', credits: 3 },
+            { code: 'INST736', title: 'Computational Linguistics II', credits: 3 },
+            { code: 'INST737', title: 'Introduction to Data Science', credits: 3 },
+            { code: 'INST741', title: 'Social Computing Technologies and Applications', credits: 3 },
+            { code: 'INST742', title: 'Implementing Digital Curation', credits: 3 },
+            { code: 'INST744', title: 'Solving Problems in Digital Curation Capstone Course', credits: 3 },
+            { code: 'INST747', title: 'Research in Advanced Digital Curation', credits: 3 },
+            { code: 'INST750', title: 'Advanced Data Science', credits: 3 },
+            { code: 'INST751', title: 'IoT and Streaming Data Analytics', credits: 3 },
+            { code: 'INST752', title: 'Location Intelligence', credits: 3 },
+            { code: 'INST753', title: 'Data Governance and Data Quality', credits: 3 },
+            { code: 'INST754', title: 'Data Integration and Preparation for Analytics', credits: 3 },
+            { code: 'INST755', title: 'eGovernment for Smart Cities', credits: 3 },
+            { code: 'INST756', title: 'Information Risk Management', credits: 3 },
+            { code: 'INST760', title: 'Data Visualization', credits: 3 },
+            { code: 'INST762', title: 'Visual Analytics', credits: 3 },
+            { code: 'INST764', title: 'Data Literacy for Arts and Entertainment Management', credits: 3 },
+            { code: 'INST767', title: 'Big Data Infrastructure', credits: 3 },
+            { code: 'INST771', title: 'Foundations of Cybersecurity', credits: 3 },
+            { code: 'INST772', title: 'Policy and Practice of Ethical Hacking', credits: 3 },
+            { code: 'INST773', title: 'Cyber Intelligence Fundamentals', credits: 3 },
+            { code: 'INST782', title: 'Arrangement Description and Access for Archives', credits: 3 },
+            { code: 'INST784', title: 'Digital Preservation', credits: 3 },
+            { code: 'INST785', title: 'Documentation Collection and Appraisal of Records', credits: 3 },
+            { code: 'INST786', title: 'Museum Research Seminar', credits: 3 }
+        ];
+
+        const coreCourses = [
+            { code: 'INFM 600', title: 'Information Management Ecosystems', credits: 3 },
+            { code: 'INST 624', title: 'Modern Software Development', credits: 3 },
+            { code: 'INFM 612', title: 'Management of Information Projects', credits: 3 },
+            { code: 'INFM 737', title: 'Industry Capstone Project', credits: 3 }
+        ];
+
+        const dsCourses = [
+            { code: 'INST 627', title: 'Foundations of Data Science', credits: 3 },
+            { code: 'INST 737', title: 'Data Science Techniques', credits: 3 },
+            { code: 'INST 754', title: 'Data Integration & Preparation', credits: 3 },
+            { code: 'INST 762', title: 'Visual Analytics', credits: 3 },
+            { code: 'INST 767', title: 'Big Data Infrastructure', credits: 3 },
+            { code: 'INST 662', title: 'Transforming Unstructured Content with AI', credits: 3 }
+        ];
+
+        const csCourses = [
+            { code: 'INST 771', title: 'Foundations of Cybersecurity', credits: 3 },
+            { code: 'INST 663', title: 'Networked Infrastructure', credits: 3 },
+            { code: 'INST 664', title: 'Cyberdefense & Ethical Hacking', credits: 3 },
+            { code: 'INST 726', title: 'Information Governance', credits: 3 },
+            { code: 'INST 756', title: 'Information Risk Management', credits: 3 },
+            { code: 'INST 665', title: 'Human-Centered Cybersecurity', credits: 3 }
+        ];
+
+        let planData = {
+            'data-science': {},
+            'cybersecurity': {},
+            'flexible': {}
+        };
+
+        let usedCourses = {
+            'data-science': new Set(),
+            'cybersecurity': new Set(),
+            'flexible': new Set()
+        };
+
+        let prefilled = {
+            'data-science': false,
+            'cybersecurity': false,
+            'flexible': false
+        };
+
+        let currentTrack = 'data-science';
+
+        function init() {
+            renderAllCourses();
+            setupDragDrop();
+            prefillTrack('data-science');
+        }
+
+        function addCourseToSemester(track, semester, course) {
+            const id = `${track}-${course.code.replace(/\s+/g, '-')}`;
+            if (!planData[track][semester]) planData[track][semester] = [];
+            planData[track][semester].push({ 
+                id, 
+                code: course.code, 
+                title: course.title, 
+                credits: course.credits 
+            });
+            usedCourses[track].add(id);
+        }
+
+        function prefillTrack(track) {
+            // Reset this track
+            planData[track] = { y1f: [], y1s: [], y2f: [], y2s: [] };
+            usedCourses[track] = new Set();
+
+            if (track === 'data-science') {
+                // Year 1 Fall: INFM 600, INST 624, INST 627
+                addCourseToSemester(track, 'y1f', coreCourses[0]); 
+                addCourseToSemester(track, 'y1f', coreCourses[1]); 
+                addCourseToSemester(track, 'y1f', dsCourses[0]); 
+
+                // Year 1 Spring: INST 737, INST 754, INST 662
+                addCourseToSemester(track, 'y1s', dsCourses[1]); 
+                addCourseToSemester(track, 'y1s', dsCourses[2]); 
+                addCourseToSemester(track, 'y1s', dsCourses[5]); 
+
+                // Year 2 Fall: INST 762, INST 767
+                addCourseToSemester(track, 'y2f', dsCourses[3]); 
+                addCourseToSemester(track, 'y2f', dsCourses[4]); 
+
+                // Year 2 Spring: INFM 612, INFM 737
+                addCourseToSemester(track, 'y2s', coreCourses[2]); 
+                addCourseToSemester(track, 'y2s', coreCourses[3]); 
+
+            } else if (track === 'cybersecurity') {
+                // Year 1 Fall: INFM 600, INST 624, INST 771
+                addCourseToSemester(track, 'y1f', coreCourses[0]); 
+                addCourseToSemester(track, 'y1f', coreCourses[1]); 
+                addCourseToSemester(track, 'y1f', csCourses[0]); 
+
+                // Year 1 Spring: INST 663, INST 664, INST 726
+                addCourseToSemester(track, 'y1s', csCourses[1]); 
+                addCourseToSemester(track, 'y1s', csCourses[2]); 
+                addCourseToSemester(track, 'y1s', csCourses[3]); 
+
+                // Year 2 Fall: INST 756, INST 665
+                addCourseToSemester(track, 'y2f', csCourses[4]); 
+                addCourseToSemester(track, 'y2f', csCourses[5]); 
+
+                // Year 2 Spring: INFM 612, INFM 737
+                addCourseToSemester(track, 'y2s', coreCourses[2]); 
+                addCourseToSemester(track, 'y2s', coreCourses[3]); 
+
+            } else if (track === 'flexible') {
+                // Year 1 Fall: INFM 600, INST 624
+                addCourseToSemester(track, 'y1f', coreCourses[0]); 
+                addCourseToSemester(track, 'y1f', coreCourses[1]); 
+
+                // Year 2 Spring: INFM 612, INFM 737
+                addCourseToSemester(track, 'y2s', coreCourses[2]); 
+                addCourseToSemester(track, 'y2s', coreCourses[3]); 
+            }
+
+            renderPlan(track);
+            renderAllCourses();
+            prefilled[track] = true;
+        }
+
+        function resetTrack(track) {
+            if (confirm('Reset this track to the default 2-year plan? All customizations will be lost.')) {
+                prefillTrack(track);
+            }
+        }
+
+        function renderAllCourses() {
+            const tracks = ['data-science', 'cybersecurity', 'flexible'];
+            tracks.forEach(track => {
+                const prefix = track === 'flexible' ? 'flex' : track.substring(0, 2);
+                
+                // Count available courses
+                const coreAvailable = coreCourses.filter(c => !usedCourses[track].has(`${track}-${c.code.replace(/\s+/g, '-')}`)).length;
+                document.getElementById(`${prefix}-core-count`).textContent = coreAvailable;
+                
+                // Render courses
+                document.getElementById(`${prefix}-core`).innerHTML = coreCourses.map(c => createCourseCard(c, track)).join('');
+                document.getElementById(`${prefix}-electives`).innerHTML = allGradCourses.map(c => createCourseCard(c, track)).join('');
+                
+                if (track !== 'flexible') {
+                    const reqCourses = track === 'data-science' ? dsCourses : csCourses;
+                    const reqAvailable = reqCourses.filter(c => !usedCourses[track].has(`${track}-${c.code.replace(/\s+/g, '-')}`)).length;
+                    document.getElementById(`${prefix}-required-count`).textContent = reqAvailable;
+                    document.getElementById(`${prefix}-required`).innerHTML = reqCourses.map(c => createCourseCard(c, track)).join('');
+                }
+                
+                const electiveAvailable = allGradCourses.filter(c => !usedCourses[track].has(`${track}-${c.code.replace(/\s+/g, '-')}`)).length;
+                document.getElementById(`${prefix}-electives-count`).textContent = electiveAvailable;
+            });
+        }
+
+        function createCourseCard(course, track) {
+            const id = `${track}-${course.code.replace(/\s+/g, '-')}`;
+            const isUsed = usedCourses[track].has(id);
+            const usedClass = isUsed ? 'used' : '';
+            
+            return `<div class="course-card ${usedClass}" draggable="${!isUsed}" data-id="${id}" data-track="${track}" data-code="${course.code}" data-title="${course.title}" data-credits="${course.credits}">
+                <div class="course-code">${course.code}</div>
+                <div class="course-title">${course.title}</div>
+                <div class="course-credits">${course.credits} cr</div>
+            </div>`;
+        }
+
+        function filterCourses(track, searchTerm) {
+            const prefix = track === 'flexible' ? 'flex' : track.substring(0, 2);
+            const sections = ['core', 'electives'];
+            if (track !== 'flexible') sections.push('required');
+            
+            searchTerm = searchTerm.toLowerCase();
+            
+            sections.forEach(section => {
+                const container = document.getElementById(`${prefix}-${section}`);
+                if (!container) return;
+                
+                const cards = container.querySelectorAll('.course-card');
+                cards.forEach(card => {
+                    const code = card.querySelector('.course-code').textContent.toLowerCase();
+                    const title = card.querySelector('.course-title').textContent.toLowerCase();
+                    
+                    if (code.includes(searchTerm) || title.includes(searchTerm)) {
+                        card.style.display = 'block';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+            });
+        }
+
+        function setupDragDrop() {
+            document.addEventListener('dragstart', (e) => {
+                if (e.target.classList.contains('course-card') && !e.target.classList.contains('used')) {
+                    e.target.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'copy';
+                }
+            });
+
+            document.addEventListener('dragend', (e) => {
+                if (e.target.classList.contains('course-card')) {
+                    e.target.classList.remove('dragging');
+                }
+            });
+
+            document.addEventListener('dragover', (e) => {
+                if (e.target.classList.contains('courses-list') || e.target.closest('.courses-list')) {
+                    e.preventDefault();
+                    e.dataTransfer.dropEffect = 'copy';
+                    const block = e.target.closest('.semester-block');
+                    if (block) block.classList.add('dragover');
+                }
+            });
+
+            document.addEventListener('dragleave', (e) => {
+                if (e.target.classList.contains('semester-block')) {
+                    e.target.classList.remove('dragover');
+                }
+            });
+
+            document.addEventListener('drop', (e) => {
+                const targetList = e.target.classList.contains('courses-list') ? e.target : e.target.closest('.courses-list');
+                
+                if (targetList) {
+                    e.preventDefault();
+                    const block = targetList.closest('.semester-block');
+                    if (block) block.classList.remove('dragover');
+                    
+                    const courseCard = document.querySelector('.course-card.dragging');
+                    if (!courseCard) return;
+
+                    const courseId = courseCard.getAttribute('data-id');
+                    const track = courseCard.getAttribute('data-track');
+                    const semester = block.getAttribute('data-semester');
+
+                    if (block.getAttribute('data-track') !== track) {
+                        alert('Cannot add courses from different tracks');
+                        return;
+                    }
+
+                    if (usedCourses[track].has(courseId)) {
+                        alert('This course is already in your plan');
+                        return;
+                    }
+
+                    const course = {
+                        id: courseId,
+                        code: courseCard.getAttribute('data-code'),
+                        title: courseCard.getAttribute('data-title'),
+                        credits: parseInt(courseCard.getAttribute('data-credits'))
+                    };
+
+                    if (!planData[track][semester]) {
+                        planData[track][semester] = [];
+                    }
+                    planData[track][semester].push(course);
+                    usedCourses[track].add(courseId);
+
+                    renderPlan(track);
+                    renderAllCourses();
+                }
+            });
+        }
+
+        function renderPlan(track) {
+            document.querySelectorAll(`[data-track="${track}"] .courses-list`).forEach(list => {
+                const semester = list.getAttribute('data-semester');
+                const courses = planData[track][semester] || [];
+                let totalCredits = 0;
+                let html = '';
+
+                courses.forEach((course, idx) => {
+                    totalCredits += course.credits;
+                    html += `<div class="course-card placed">
+                        <div style="display:flex; justify-content:space-between; align-items:start;">
+                            <div style="flex: 1;">
+                                <div class="course-code">${course.code}</div>
+                                <div class="course-title">${course.title}</div>
+                                <div class="course-credits">${course.credits} cr</div>
+                            </div>
+                            <button class="btn-remove" onclick="removeCourse('${track}', '${semester}', ${idx})">×</button>
+                        </div>
+                    </div>`;
+                });
+
+                list.innerHTML = html;
+                list.closest('.semester-block').querySelector('.semester-credits').textContent = `${totalCredits} credits`;
+            });
+        }
+
+        function removeCourse(track, semester, idx) {
+            const course = planData[track][semester][idx];
+            usedCourses[track].delete(course.id);
+            planData[track][semester].splice(idx, 1);
+            renderPlan(track);
+            renderAllCourses();
+        }
+
+        function exportPlanToCSV(track) {
+            const trackNames = {
+                'data-science': 'Data Science & Analytics',
+                'cybersecurity': 'Cybersecurity & Risk Management',
+                'flexible': 'Flexible Individual Plan'
+            };
+
+            let csvContent = "MIM 2-Year Degree Plan Export\n";
+            csvContent += `Track: ${trackNames[track]}\n`;
+            csvContent += `Export Date: ${new Date().toLocaleDateString()}\n`;
+            csvContent += `Student Name: [Enter your name]\n\n`;
+            csvContent += "Year,Semester,Course Code,Course Title,Credits,Type\n";
+
+            const semesterOrder = ['y1f', 'y1s', 'y2f', 'y2s'];
+            const semesterLabels = ['Year 1 Fall', 'Year 1 Spring', 'Year 2 Fall', 'Year 2 Spring'];
+
+            semesterOrder.forEach((semester, idx) => {
+                const courses = planData[track][semester] || [];
+                courses.forEach(course => {
+                    const year = semester.includes('y1') ? '1' : '2';
+                    const semesterName = semesterLabels[idx];
+                    const courseType = getCourseType(course.code, track);
+                    csvContent += `${year},"${semesterName}","${course.code}","${course.title}",${course.credits},"${courseType}"\n`;
+                });
+            });
+
+            // Add totals
+            let totalCredits = 0;
+            semesterOrder.forEach(semester => {
+                const courses = planData[track][semester] || [];
+                courses.forEach(course => {
+                    totalCredits += course.credits;
+                });
+            });
+
+            csvContent += `\n\nProgram Summary\n`;
+            csvContent += `Total Credits Planned: ${totalCredits}\n`;
+            csvContent += `Degree Requirement: 36 credits\n`;
+            csvContent += `Remaining Credits Needed: ${Math.max(0, 36 - totalCredits)}\n`;
+            csvContent += `Status: ${totalCredits >= 36 ? 'Complete ✓' : 'In Progress'}\n`;
+
+            // Download CSV
+            const element = document.createElement('a');
+            element.setAttribute('href', 'data:text/csv;charset=utf-8,' + encodeURIComponent(csvContent));
+            element.setAttribute('download', `MIM_${track.replace('-', '_')}_Plan_${new Date().toISOString().slice(0, 10)}.csv`);
+            element.style.display = 'none';
+            document.body.appendChild(element);
+            element.click();
+            document.body.removeChild(element);
+        }
+
+        function getCourseType(code, track) {
+            if (coreCourses.some(c => c.code === code)) return 'Core';
+            if (track === 'data-science' && dsCourses.some(c => c.code === code)) return 'Track Required';
+            if (track === 'cybersecurity' && csCourses.some(c => c.code === code)) return 'Track Required';
+            return 'Elective';
+        }
+
+        function switchTrack(track, element) {
+            currentTrack = track;
+
+            document.querySelectorAll('.track-tab').forEach(tab => tab.style.display = 'none');
+            document.getElementById(`${track}-tab`).style.display = 'block';
+
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            element.classList.add('active');
+
+            if (!prefilled[track]) {
+                prefillTrack(track);
+            }
+        }
+
+        function switchView(view) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(view).classList.add('active');
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html>
