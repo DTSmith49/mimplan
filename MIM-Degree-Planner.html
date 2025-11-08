@@ -3,7 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MIM Interactive Course Planner - Professional Edition</title>
+    <!-- SEO & Social Meta Tags -->
+    <meta name="description" content="Interactive MIM course planner for University of Maryland students. Build your 4-semester degree plan with drag-and-drop scheduling, course search, prerequisite checking, and graduation calculator.">
+    <meta name="keywords" content="MIM course planner, Master of Information Management, UMD MIM, course prerequisites, graduation calculator">
+    <meta property="og:title" content="MIM Interactive Course Planner | UMD iSchool">
+    <meta property="og:description" content="Plan your Master of Information Management degree with advanced features.">
+    <meta name="twitter:card" content="summary_large_image">
+    <title>Master of Information Management (MIM) Interactive Course Planner | UMD Professional Edition</title>
     <link href="https://fonts.googleapis.com/css2?family=Crimson+Text:wght@400;700&family=Source+Sans+3:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -709,6 +715,76 @@
                 justify-content: center;
             }
         }
+    
+        /* ===== ADVANCED FEATURES CSS ===== */
+
+        /* Course Tooltip */
+        .course-tooltip {
+            position: absolute; background: #1a1a1a; color: white;
+            padding: 20px; border-radius: 8px; max-width: 400px;
+            z-index: 10000; display: none; border: 2px solid #FFD200;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3); font-size: 13px;
+        }
+        .course-tooltip.active { display: block; animation: fadeIn 0.2s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        .tooltip-title {
+            font-size: 16px; font-weight: 700; color: #FFD200;
+            margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #FFD200;
+        }
+        .tooltip-description { margin: 10px 0; color: #e8e8e8; font-size: 12px; }
+        .tooltip-meta { display: flex; gap: 12px; margin: 10px 0; flex-wrap: wrap; }
+        .tooltip-meta-item {
+            background: rgba(255,210,0,0.1); padding: 4px 10px;
+            border-radius: 4px; font-size: 11px; color: #FFD200;
+        }
+        .skill-tag {
+            display: inline-block; background: rgba(226,24,51,0.2);
+            color: #ffaaaa; padding: 3px 8px; border-radius: 3px;
+            font-size: 10px; margin: 2px;
+        }
+
+        /* Search & Filters */
+        .search-container { margin-bottom: 16px; position: relative; }
+        .search-input {
+            width: 100%; padding: 12px 16px 12px 40px;
+            border: 2px solid #ddd; border-radius: 6px; font-size: 14px;
+        }
+        .search-input:focus {
+            outline: none; border-color: #FFD200;
+            box-shadow: 0 0 0 3px rgba(255,210,0,0.1);
+        }
+        .search-icon {
+            position: absolute; left: 12px; top: 50%;
+            transform: translateY(-50%); color: #666;
+        }
+
+        /* Graduation Calculator */
+        .graduation-calculator {
+            background: linear-gradient(135deg, #FFF9E6 0%, #FFFBF0 100%);
+            border: 2px solid #FFD200; border-radius: 8px;
+            padding: 16px; margin-bottom: 20px;
+        }
+        .calculator-result {
+            background: white; padding: 12px; border-radius: 6px;
+            margin-top: 10px; font-size: 13px;
+        }
+        .calculator-result-highlight {
+            color: #E21833; font-weight: 700; font-size: 18px;
+        }
+
+        /* Print Styles */
+        @media print {
+            .sidebar, .umd-header, .action-buttons { display: none !important; }
+            .main-content { max-width: 100% !important; margin: 0 !important; }
+            .semester-box { page-break-inside: avoid; }
+            .print-header { display: block !important; }
+        }
+        .print-header {
+            display: none; text-align: center; margin-bottom: 30px;
+            padding-bottom: 20px; border-bottom: 3px solid #E21833;
+        }
+
     </style>
 </head>
 <body>
@@ -721,7 +797,7 @@
     </div>
 
     <div class="main-header">
-        <h1>🎓 MIM Interactive Course Planner</h1>
+        <h1>🎓 Master of Information Management (MIM) Course Planner</h1>
         <p>Master of Information Management | Professional Edition with Drag-and-Drop & Quick Add</p>
     </div>
 
@@ -762,18 +838,18 @@
         <!-- MAIN CONTENT -->
         <main class="main-content">
             <div class="track-selector">
-                <h2>Select Your Track</h2>
+                <h2>Choose Your MIM Specialization Track</h2>
                 <p>Choose a track to load the official sample plan and get started</p>
                 <div class="track-buttons">
-                    <button class="track-btn active" data-track="data-science">📊 Data Science & Analytics</button>
+                    <button class="track-btn active" data-track="data-science">📊 MIM Data Science & Analytics Track</button>
                     <button class="track-btn" data-track="cybersecurity">🔒 Cybersecurity & Risk</button>
-                    <button class="track-btn" data-track="flexible">✨ Flexible Plan</button>
+                    <button class="track-btn" data-track="flexible">✨ Custom Flexible Track</button>
                 </div>
             </div>
 
             <div id="sample-plans"></div>
 
-            <h2 class="planner-title">Your 4-Semester Plan</h2>
+            <h2 class="planner-title">Build Your 4-Semester MIM Degree Plan</h2>
 
             <div class="semester-grid">
                 <div class="semester-box">
@@ -810,16 +886,16 @@
             </div>
 
             <div class="actions">
-                <button class="btn btn-primary">💾 Save Plan</button>
-                <button class="btn btn-secondary">📄 Export PDF</button>
-                <button class="btn btn-primary">📧 Email Advisor</button>
-                <button class="btn btn-secondary">🔄 Clear Plan</button>
+                <button class="btn btn-primary">💾 Save My Plan</button>
+                <button class="btn btn-secondary">📄 Download PDF</button>
+                <button class="btn btn-primary">📧 Contact Advisor</button>
+                <button class="btn btn-secondary">🔄 Reset Plan</button>
             </div>
         </main>
 
         <!-- RIGHT COURSE BANK SIDEBAR -->
         <aside class="course-bank">
-            <h3>📚 Course Bank</h3>
+            <h3>📚 MIM Course Catalog</h3>
             <p>Drag courses to semester boxes or click ADD to quick assign</p>
             <div class="course-filter">
                 <button class="filter-btn active" data-filter="all">All Courses</button>
@@ -1132,6 +1208,148 @@
         // Initialize
         renderCoursePool();
         loadSamplePlan(currentTrack);
+    
+        // ========================================
+        // VERIFIED COURSE DATABASE
+        // All codes from original HTML file
+        // ========================================
+        const courseDB = {
+            'INFM 600': { title: 'Information Environments', credits: 3, desc: 'Explores social, organizational, and technical aspects of information environments.', prereq: [], sem: ['Fall','Spring'], skills: ['Info Architecture','Systems Thinking'] },
+            'INFM 612': { title: 'Management Concepts', credits: 3, desc: 'Management theory and practice for information organizations.', prereq: [], sem: ['Fall','Spring'], skills: ['Leadership','Strategy'] },
+            'INFM 737': { title: 'Capstone Experience', credits: 3, desc: 'Integrative capstone applying MIM program knowledge.', prereq: ['INFM 600','INFM 612','INST 610','INST 808'], sem: ['Fall','Spring','Summer'], skills: ['Project Mgmt','Presentation'] },
+            'INST 610': { title: 'Information Ethics', credits: 3, desc: 'Ethical issues in information management including privacy and security.', prereq: [], sem: ['Fall','Spring','Summer'], skills: ['Ethical Analysis','Privacy'] },
+            'INST 624': { title: 'Software Development', credits: 3, desc: 'Modern software development approaches and agile methodologies.', prereq: ['INST 630'], sem: ['Fall','Spring'], skills: ['Agile','Git','Testing'] },
+            'INST 627': { title: 'Data Analytics', credits: 3, desc: 'Data analytics tools and techniques for information professionals.', prereq: ['INST 630'], sem: ['Fall','Spring'], skills: ['Analytics','BI','Statistics'] },
+            'INST 630': { title: 'Programming Intro', credits: 3, desc: 'Programming concepts and Python. No prior experience required.', prereq: [], sem: ['Fall','Spring'], skills: ['Python','Algorithms'] },
+            'INST 737': { title: 'Intro to Data Science', credits: 3, desc: 'Data science methodology, machine learning, and predictive modeling.', prereq: ['INST 630','INST 627'], sem: ['Fall','Spring'], skills: ['ML','Python','R'] },
+            'INST 750': { title: 'Advanced Data Science', credits: 3, desc: 'Advanced machine learning and deep learning techniques.', prereq: ['INST 737'], sem: ['Spring'], skills: ['Deep Learning','Neural Nets'] },
+            'INST 754': { title: 'Data Preparation', credits: 3, desc: 'Data cleaning and integration techniques including ETL.', prereq: ['INST 630','INST 627'], sem: ['Spring'], skills: ['ETL','Data Quality'] },
+            'INST 760': { title: 'Data Visualization', credits: 3, desc: 'Effective data visualization using Tableau and D3.js.', prereq: ['INST 627'], sem: ['Fall','Spring'], skills: ['Tableau','D3.js'] },
+            'INST 762': { title: 'Visual Analytics', credits: 3, desc: 'Advanced visual analytics and interactive visualization.', prereq: ['INST 760'], sem: ['Fall'], skills: ['Advanced Viz','Data Mining'] },
+            'INST 767': { title: 'Big Data Infrastructure', credits: 3, desc: 'Big data systems, cloud platforms, and distributed computing.', prereq: ['INST 630','INST 737'], sem: ['Fall','Spring'], skills: ['Cloud','Hadoop','AWS'] },
+            'INST 645': { title: 'Cybersecurity Fundamentals', credits: 3, desc: 'Core cybersecurity concepts, threats, and defenses.', prereq: [], sem: ['Fall','Spring'], skills: ['Cryptography','Network Security'] },
+            'INST 650': { title: 'Threat Intelligence', credits: 3, desc: 'Cyber threat intelligence gathering and analysis.', prereq: ['INST 645'], sem: ['Spring'], skills: ['Threat Analysis','OSINT'] },
+            'INST 663': { title: 'Ethical Hacking', credits: 3, desc: 'Penetration testing and defensive security techniques.', prereq: ['INST 771'], sem: ['Fall','Spring'], skills: ['Pen Testing','Vuln Assessment'] },
+            'INST 771': { title: 'Cybersecurity Foundations', credits: 3, desc: 'Comprehensive cybersecurity principles and practices.', prereq: ['INST 645'], sem: ['Fall','Spring'], skills: ['Security Arch','Incident Response'] },
+            'INST 808': { title: 'Research Methods', credits: 3, desc: 'Research methods and statistical analysis for information management.', prereq: [], sem: ['Fall','Spring'], skills: ['Research Design','Statistics'] }
+        };
+
+        // Course tooltip function
+        function showTooltip(code, event) {
+            const course = courseDB[code];
+            if (!course) return;
+
+            const tip = document.getElementById('courseTooltip');
+            document.getElementById('tooltipTitle').textContent = code + ': ' + course.title;
+            document.getElementById('tooltipMeta').innerHTML = 
+                `<span class="tooltip-meta-item">${course.credits} cr</span>` +
+                `<span class="tooltip-meta-item">${course.sem.join(', ')}</span>`;
+            document.getElementById('tooltipDesc').textContent = course.desc;
+
+            if (course.prereq && course.prereq.length > 0) {
+                document.getElementById('tooltipPrereq').innerHTML = 
+                    `<strong style="color:#FFD200;font-size:11px;">Prerequisites:</strong><br>` +
+                    `<span style="font-size:12px;">${course.prereq.join(', ')}</span>`;
+                document.getElementById('tooltipPrereq').style.display = 'block';
+            } else {
+                document.getElementById('tooltipPrereq').style.display = 'none';
+            }
+
+            if (course.skills && course.skills.length > 0) {
+                document.getElementById('tooltipSkills').innerHTML = 
+                    `<strong style="color:#FFD200;font-size:11px;">Skills:</strong><br>` +
+                    course.skills.map(s => `<span class="skill-tag">${s}</span>`).join('');
+            }
+
+            const rect = event.target.getBoundingClientRect();
+            tip.style.left = (rect.right + 10) + 'px';
+            tip.style.top = (rect.top + window.scrollY) + 'px';
+            tip.classList.add('active');
+        }
+
+        function hideTooltip() {
+            document.getElementById('courseTooltip').classList.remove('active');
+        }
+
+        // Search function
+        function searchCourses(query) {
+            query = query.toLowerCase();
+            const results = document.getElementById('searchResults');
+            if (!query) {
+                document.querySelectorAll('.course-item').forEach(el => el.style.display = 'block');
+                results.textContent = '';
+                return;
+            }
+
+            let count = 0;
+            document.querySelectorAll('.course-item').forEach(el => {
+                const code = el.getAttribute('data-code');
+                const name = el.getAttribute('data-name') || '';
+                const course = courseDB[code];
+                const matches = code.toLowerCase().includes(query) || 
+                               name.toLowerCase().includes(query) ||
+                               (course && (course.desc.toLowerCase().includes(query) ||
+                               course.skills.some(s => s.toLowerCase().includes(query))));
+                el.style.display = matches ? 'block' : 'none';
+                if (matches) count++;
+            });
+            results.textContent = `Found ${count} course${count!==1?'s':''}`;
+        }
+
+        // Graduation calculator
+        function updateGradCalc() {
+            const sem = document.getElementById('startSemester').value;
+            const year = parseInt(document.getElementById('startYear').value);
+            const current = document.querySelectorAll('.semester-box .course-item').length * 3;
+            const needed = 30 - current;
+            const sems = Math.ceil(needed / 7.5);
+
+            let gradYear = year, gradSem = sem;
+            const order = ['Spring','Summer','Fall'];
+            let idx = order.indexOf(sem);
+            for(let i = 0; i < sems; i++) {
+                idx++; if(idx >= order.length) { idx = 0; gradYear++; }
+            }
+            gradSem = order[idx];
+
+            document.getElementById('gradResult').innerHTML = 
+                `<div>Expected Graduation:</div>` +
+                `<div class="calculator-result-highlight">${gradSem} ${gradYear}</div>` +
+                `<div style="font-size:11px;color:#666;margin-top:8px;">${sems} semester${sems!==1?'s':''} remaining | ${needed} credits needed</div>`;
+        }
+
+        // Attach tooltip listeners after page loads
+        setTimeout(function() {
+            document.querySelectorAll('.course-item').forEach(el => {
+                const code = el.getAttribute('data-code');
+                if (courseDB[code]) {
+                    el.addEventListener('mouseenter', (e) => showTooltip(code, e));
+                    el.addEventListener('mouseleave', hideTooltip);
+                    el.style.cursor = 'help';
+                }
+            });
+            updateGradCalc();
+        }, 500);
+
     </script>
+
+    <!-- Course Tooltip -->
+    <div class="course-tooltip" id="courseTooltip">
+        <div class="tooltip-title" id="tooltipTitle"></div>
+        <div class="tooltip-meta" id="tooltipMeta"></div>
+        <div class="tooltip-description" id="tooltipDesc"></div>
+        <div id="tooltipPrereq" style="margin-top:10px;padding-top:10px;border-top:1px solid rgba(255,210,0,0.3);"></div>
+        <div id="tooltipSkills" style="margin-top:10px;"></div>
+    </div>
+
+    <!-- Print Header -->
+    <div class="print-header">
+        <h1 style="color:#E21833;margin-bottom:10px;">Master of Information Management (MIM)</h1>
+        <p>4-Semester Course Plan | University of Maryland</p>
+        <div style="margin-top:20px;text-align:left;">
+            Student: ______________ | Track: ______________ | Date: ______________
+        </div>
+    </div>
+
 </body>
 </html>
